@@ -47,21 +47,26 @@ def get_entity_info(request):
     infobox = {}
     wikidata_prop = _get_wikidata_info(entity_id, lang)
     wikidata_headers = _get_headers(entity_id, lang)
-
     if wikidata_prop.status_code != 200:
         raise APIException("Error on Wikidata API", wikidata_prop.status_code)
 
     if wikidata_headers.status_code != 200:
         raise APIException("Error on Wikidata API", wikidata_headers.status_code)
 
-    infobox['label'] = wikidata_headers.json()['results']['bindings'][0]['label']['value']
-
-    if 'description' in wikidata_headers.json()['results']['bindings'][0].keys():
-        infobox['description'] = wikidata_headers.json()['results']['bindings'][0]['description']['value']
-
-    if 'picture' in wikidata_headers.json()['results']['bindings'][0].keys():
-        infobox['image'] = wikidata_headers.json()['results']['bindings'][0]['picture']['value']
-
+    try:
+        infobox['label'] = wikidata_headers.json()['results']['bindings'][0]['label']['value']
+    except IndexError:
+        infobox['label'] = 'No available label in Wikidata for this Language'
+    try:
+        if 'description' in wikidata_headers.json()['results']['bindings'][0].keys():
+            infobox['description'] = wikidata_headers.json()['results']['bindings'][0]['description']['value']
+    except IndexError:
+        infobox['description'] = 'No available description in Wikidata for this Language'
+    try:
+        if 'picture' in wikidata_headers.json()['results']['bindings'][0].keys():
+            infobox['image'] = wikidata_headers.json()['results']['bindings'][0]['picture']['value']
+    except IndexError:
+        pass
     if strategy == 'baseline':
         infobox['properties'] = _infobox_baseline(wikidata_prop.json().get('results').get('bindings'), size)
 
