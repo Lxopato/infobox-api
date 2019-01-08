@@ -37,7 +37,7 @@ def get_entity_info(request):
     strategy = request.GET['strategy'] or ''
     size = 25
 
-    if strategy not in ['baseline', 'frecuency', 'pagerank', 'multiplicative', 'sum']:
+    if strategy not in ['baseline', 'frequency', 'pagerank', 'multiplicative', 'sum']:
         raise ValidationError('A valid strategy must be specified (or the parameter must not be used)', code=400)
     if entity_id == '':
         raise ValidationError('An entity ID must be given (add id parameter)', code=400)
@@ -70,7 +70,7 @@ def get_entity_info(request):
     if strategy == 'baseline':
         infobox['properties'] = _infobox_baseline(wikidata_prop.json().get('results').get('bindings'), size)
 
-    elif strategy == 'frecuency':
+    elif strategy == 'frequency':
         infobox['properties'] = _infobox_frecuency_count(wikidata_prop.json().get('results').get('bindings'), size)
 
     elif strategy == 'pagerank':
